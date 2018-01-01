@@ -33,6 +33,20 @@ def setGlobals():
 	water = 20
 	global tube
 	tube = 21
+	global pouring,lastPinState,pinState,lastPinChange,pinChange
+	global pinDelta,hertz,flow,litersPoured,pintsPoured
+	pouring = False
+	lastPinState = False
+	pinState = 0
+	lastPinChange = int(time.time() * 1000)
+	pourStart = 0
+	pinChange = lastPinChange
+	pinDelta = 0
+	hertz = 0
+	flow = 0
+	litersPoured = 0
+	pintsPoured = 0
+	global now
 
 def openPin(pin):
 	GPIO.output(pin,GPIO.LOW)
@@ -40,31 +54,35 @@ def openPin(pin):
 
 def closePin(pin):
 	GPIO.output(pin,GPIO.HIGH) 
-	print ("closePin()")
+	logging.debug("closePin()")
 
 def setup():
-	print ("Start setup()")
-	global sht
+	logging.debug("Start setup()")
+	global sht,water,tube
 	sht = Sht(27, 17)
 	GPIO.setup(water, GPIO.OUT) 
+	GPIO.setup(tube, GPIO.OUT) 
+	GPIO.setup(22,GPIO.IN, pull_up_down=GPIO.PUD_UP)
 	closePin(water)
+	closePin(tube)
 	logging.basicConfig(filename='log.txt',level=logging.DEBUG)		             
 		
 def getValues(sp):
-	print ("Start getValues()")
-	global Liters,temp,hum
+	logging.debug("Start getValues()")
+	global Liters,temp,hum,now,litersPoured
 	if sp == 1:
 		h = mcp.read_adc(0)
 		hum = (1 - (float(h)/ 1023))* 200 
-		print ("Humidity:" + str(hum))
+		logging.debug("Humidity:" + str(hum))
 	elif sp == 2:
 		t = mcp.read_adc(1)
 		temp = float(t) - 40
-		print ("Temperature:" + str(temp))
+		logging.debug("Temperature:" + str(temp))
 	elif sp == 3:
 		l = ("Liters: 0")
-		Liters = 0
+		Liters = litersPoured
 		print ("Running Liters: " + str(Liters))
+		logging.debug("Running Liters: " + str(Liters))
 
 def getValuesDigital(sp):
 	print ("getValuesDigital()")
@@ -86,8 +104,8 @@ def getAndWrite():
 	print ("Start getAndWrite()")
 	global hum,temp,Liters,status,data
 	for x in range(1, 4):
-		#getValues(x)
-		getValuesDigital(x)
+		getValues(x)
+		#getValuesDigital(x)
 		print ("Read value with code: " + str(x))
 		time.sleep(2) 
 		if x == 1:
@@ -115,8 +133,8 @@ def getStatus():
 		l = json.loads(response)
 		Upstatus = l['status']
 	except:
-		print ("getStatus error")
-	print (str(Upstatus) + " ... Server's status")
+		logging.error("getStatus error")
+	logging.info(str(Upstatus) + " ... Server's status")
 	if status == False and Upstatus == True:
 		changeStatusTrue()
 	elif status == True and Upstatus == False:
@@ -128,17 +146,38 @@ def changeStatusTrue():
 		status = True
 		openPin(water)
 		print ("Watering... Status: " + str(status))	
+		logging.debug("Watering... Status: " + str(status))	
 
 def changeStatusFalse():
 	global status, water
 	if status == True:
 		status = False
 		closePin(water)
-		print ("Watering... Status: " + str(status))	
+		print ("Watering... Status: " + str(status))
+		logging.debug("Watering... Status: " + str(status))		
+
+def flowMeter():
+	global pouring,lastPinState,pinState,lastPinChange,pinChange
+	global pinDelta,hertz,flow,litersPoured,pintsPoured,now	
+	if(pinState != lastPinState and pinState == True):
+		if(pouring == False):
+			pourStart = now
+	pouring = True
+	# get the current time
+	pinChange = currentTime
+	pinDelta = pinChange - lastPinChange
+	if (pinDelta < 1000):
+		# calculate the instantaneous speed
+		hertz = 1000.0000 / pinDelta
+		flow = hertz / (60 * 7.5) # L/s
+		litersPoured += flow * (pinDelta / 1000.0000)
+		pintsPoured = litersPoured * 2.11338
+    			
 	
 if __name__ == '__main__':     # Program start from here
   setGlobals()
- 
+  global now
+
   CLK = 11
   CS = 8
   MISO = 9
@@ -157,6 +196,7 @@ if __name__ == '__main__':     # Program start from here
   try:
     while True:
         now = datetime.datetime.now()
+        logging.info(now)
         print ("Time is :" + str(now))
         getStatus()              
         if sendDataMorningTime < now < sendDataNightTime and sendDataMorningBit == False:
@@ -171,6 +211,11 @@ if __name__ == '__main__':     # Program start from here
             print ("Reset onSend Counters")	
         time.sleep(2) 	
         getAndWrite()
+        if GPIO.input(22):
+            pinState = True
+        else:
+            pinState = False
+        flowMeter()			
   except KeyboardInterrupt:
     print ("Exiting Safely")
     closePin(water)
