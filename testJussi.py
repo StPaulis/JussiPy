@@ -66,8 +66,7 @@ def getValues(sp):
 		print ("Running Liters: " + str(Liters))
 
 def getValuesDigital(sp):
-    print "getValuesDigital()"
-	
+	print ("getValuesDigital()")
 	global Liters,temp,hum
 	if sp < 3:
 		temp = sht.read_t()
