@@ -73,9 +73,9 @@ def getValuesDigital(sp):
 	print ("getValuesDigital()")
 	global Liters,temp,hum,sht
 	if sp < 3:
-		temp = sht..read_temperature_C()
+		temp = sht.read_temperature_C()
 		hum = sht.read_humidity()
-		dew_point = sht..calculate_dew_point(temp, hum)
+		dew_point = sht.calculate_dew_point(temp, hum)
 		print ("Humidity:" + str(hum) + ", Temp:" + str(temp))
 		logging.debug("Humidity:" + str(hum) + ", Temp:" + str(temp))
 	elif sp == 3:
