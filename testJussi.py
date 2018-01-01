@@ -173,8 +173,7 @@ def flowMeter():
 		litersPoured += flow * (pinDelta / 1000.0000)
 		pintsPoured = litersPoured * 2.11338
 	if (pouring == True and pinState == lastPinState and (currentTime - lastPinChange) > 3000):
-	# set pouring back to false, tweet the current amt poured, and reset everything
-	pouring = False	
+		pouring = False	
     			
 	
 if __name__ == '__main__':     # Program start from here
