@@ -158,13 +158,13 @@ def changeStatusFalse():
 
 def flowMeter():
 	global pouring,lastPinState,pinState,lastPinChange,pinChange
-	global pinDelta,hertz,flow,litersPoured,pintsPoured,now	
+	global pinDelta,hertz,flow,litersPoured,pintsPoured,currentTime	
 	if(pinState != lastPinState and pinState == True):
 		if(pouring == False):
-			pourStart = now
+			pourStart = currentTime
 	pouring = True
 	# get the current time
-	pinChange = now
+	pinChange = currentTime
 	pinDelta = pinChange - lastPinChange
 	if (pinDelta < 1000):
 		# calculate the instantaneous speed
@@ -172,11 +172,14 @@ def flowMeter():
 		flow = hertz / (60 * 7.5) # L/s
 		litersPoured += flow * (pinDelta / 1000.0000)
 		pintsPoured = litersPoured * 2.11338
+	if (pouring == True and pinState == lastPinState and (currentTime - lastPinChange) > 3000):
+	# set pouring back to false, tweet the current amt poured, and reset everything
+	pouring = False	
     			
 	
 if __name__ == '__main__':     # Program start from here
   setGlobals()
-  global now
+  global now, currentTime
 
   CLK = 11
   CS = 8
@@ -211,6 +214,7 @@ if __name__ == '__main__':     # Program start from here
             print ("Reset onSend Counters")	
         time.sleep(2) 	
         getAndWrite()
+		currentTime = int(time.time() * 1000)
         if GPIO.input(22):
             pinState = True
         else:
