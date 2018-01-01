@@ -20,7 +20,7 @@ GPIO.setwarnings(False)
 def setGlobals():
 	print ("Start setGlobal()")
 	global sht
-	sht = Sht(27, 17)
+	sht = Sht(17, 27)
 	global temp
 	temp = 25.32
 	global Liters
