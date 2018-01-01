@@ -19,6 +19,8 @@ GPIO.setwarnings(False)
 
 def setGlobals():
 	print ("Start setGlobal()")
+	global sht
+	sht = Sht(21, 17)
 	global temp
 	temp = 25.32
 	global Liters
@@ -44,7 +46,6 @@ def closePin(pin):
 
 def setup():
 	print ("Start setup()")
-	sht = Sht(21, 17)
 	GPIO.setup(water, GPIO.OUT) 
 	closePin(water)
 	logging.basicConfig(filename='log.txt',level=logging.DEBUG)		             
@@ -67,7 +68,7 @@ def getValues(sp):
 
 def getValuesDigital(sp):
 	print ("getValuesDigital()")
-	global Liters,temp,hum
+	global Liters,temp,hum,sht
 	if sp < 3:
 		temp = sht.read_t()
 		hum = sht.read_rh(t)
