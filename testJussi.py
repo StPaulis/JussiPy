@@ -19,8 +19,6 @@ GPIO.setwarnings(False)
 
 def setGlobals():
 	print ("Start setGlobal()")
-	global sht
-	sht = Sht(27, 17, voltage=ShtVDDLevel.vdd_5v)
 	global temp
 	temp = 25.32
 	global Liters
@@ -46,6 +44,8 @@ def closePin(pin):
 
 def setup():
 	print ("Start setup()")
+	global sht
+	sht = Sht(27, 17, voltage=ShtVDDLevel.vdd_5v)
 	GPIO.setup(water, GPIO.OUT) 
 	closePin(water)
 	logging.basicConfig(filename='log.txt',level=logging.DEBUG)		             
