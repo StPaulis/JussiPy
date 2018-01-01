@@ -164,7 +164,7 @@ def flowMeter():
 			pourStart = now
 	pouring = True
 	# get the current time
-	pinChange = currentTime
+	pinChange = now
 	pinDelta = pinChange - lastPinChange
 	if (pinDelta < 1000):
 		# calculate the instantaneous speed
