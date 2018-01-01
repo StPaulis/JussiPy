@@ -12,7 +12,8 @@ import requests
 import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
 import logging
-from sht1x.Sht1x import Sht1x as SHT1x
+from sht_sensor import Sht
+# from pi_sht1x import SHT1x
 
 GPIO.setwarnings(False)
 
@@ -43,14 +44,10 @@ def closePin(pin):
 
 def setup():
 	print ("Start setup()")
-	global sht,water,tube
-	dataPin = 17
-	clkPin = 27
-	sht1x = SHT1x(dataPin, clkPin, SHT1x.GPIO_BCM)
-	GPIO.setup(water, GPIO.OUT)
-	GPIO.setup(tube, GPIO.OUT) 
+	global sht
+	sht = Sht(27, 17)
+	GPIO.setup(water, GPIO.OUT) 
 	closePin(water)
-	closePin(tube)
 	logging.basicConfig(filename='log.txt',level=logging.DEBUG)		             
 		
 def getValues(sp):
@@ -73,9 +70,9 @@ def getValuesDigital(sp):
 	print ("getValuesDigital()")
 	global Liters,temp,hum,sht
 	if sp < 3:
-		temp = sht.read_temperature_C()
-		hum = sht.read_humidity()
-		dew_point = sht.calculate_dew_point(temp, hum)
+		temp = sht.read_t()
+		hum = sht.read_rh(t)
+		dew_point = sht.read_dew_point(t, rh)
 		print ("Humidity:" + str(hum) + ", Temp:" + str(temp))
 		logging.debug("Humidity:" + str(hum) + ", Temp:" + str(temp))
 	elif sp == 3:
