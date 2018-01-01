@@ -11,11 +11,12 @@ import urllib2
 import requests
 import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
+import logging
 
 def setGlobals():
 	print "Start setGlobal()"
 	global temp
-	temp = 25.32
+	temp = 6.5
 	global Liters
 	Liters = 0
 	global hum
@@ -25,7 +26,9 @@ def setGlobals():
 	global Upstatus
 	Upstatus = False
 	global water
-	water = 21
+	water = 20
+	global tube 
+	tube = 21
 
 def openPin(pin):
 	GPIO.output(pin,GPIO.LOW)
@@ -39,7 +42,11 @@ def setup():
 	print "Start setup()"
 	#GPIO.setmode(GPIO.BOARD) #Numbers GPIOs by physical location
 	GPIO.setup(water, GPIO.OUT) 
-	closePin(water)			             
+	GPIO.setup(tube, GPIO.OUT) 
+	GPIO.setup(22,GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	closePin(water)
+	closePin(tube)
+	logging.basicConfig(filename='log.txt',level=logging.DEBUG)			             
 		
 def getValues(sp):
 	print "Start getValues()"
@@ -49,13 +56,15 @@ def getValues(sp):
 		hum = round((1 - (float(h)/ 1023))* 200 )
 		print "Humidity:" + str(hum)
 	elif sp == 2:
-		t = mcp.read_adc(1)
-		temp = float(t) - 40
+		t = mcp.read_adc(7)
+		if t < 60 and t > 40
+			temp = float(t) - 40
 		print "Temperature:" + str(temp)
 	elif sp == 3:
 		l = "Liters: 0"
 		Liters = 0
 		print "Running Liters: " + str(Liters)
+	logging.debug("Hum" +  str(hum)  + "Temperature:" + str(temp)  + "Running Liters: " + str(Liters))	
 
 # TODO:POst
 def getAndWrite():
@@ -147,7 +156,6 @@ if __name__ == '__main__':     # Program start from here
   mcp = Adafruit_MCP3008.MCP3008(clk=CLK, cs=CS, miso=MISO, mosi=MOSI)
   
   setup()
-  
   now = datetime.datetime.now()
   sendDataMorningTime = now.replace(hour=8, minute=0, second=0, microsecond=0)
   sendDataNightTime = now.replace(hour=20, minute=0, second=0, microsecond=0)
@@ -158,7 +166,9 @@ if __name__ == '__main__':     # Program start from here
   try:
     while True:
         now = datetime.datetime.now()
-        getStatus()              
+        getStatus() 
+		logging.debug(str(now)
+		logging.debug("Status" + str(status))             
         if sendDataMorningTime < now < sendDataNightTime and sendDataMorningBit == False:
             sendDataMorningBit = True
             getAndWrite()
@@ -167,9 +177,8 @@ if __name__ == '__main__':     # Program start from here
             getAndWrite()
         elif now < restartTime and sendDataMorningBit == True:
             sendDataNightBit = False
-            sendDataMorningBit = False	
-        getAndWrite()	
-        time.sleep(5) 	
+            sendDataMorningBit = False		
+        time.sleep(2) 	
   except KeyboardInterrupt:
     print "Exiting Safely"
     closePin(water)
