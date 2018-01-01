@@ -213,7 +213,7 @@ if __name__ == '__main__':     # Program start from here
             print ("Reset onSend Counters")	
         time.sleep(2) 	
         getAndWrite()
-		currentTime = int(time.time() * 1000)
+        currentTime = int(time.time() * 1000)
         if GPIO.input(22):
             pinState = True
         else:
