@@ -32,9 +32,9 @@ def setGlobals():
 	global Upstatus
 	Upstatus = False
 	global water
-	water = 21
+	water = 20
 	global tube
-	tube = 20
+	tube = 21
 
 def openPin(pin):
 	GPIO.output(pin,GPIO.LOW)
