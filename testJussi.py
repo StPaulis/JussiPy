@@ -173,8 +173,15 @@ def flowMeter():
 		litersPoured += flow * (pinDelta / 1000.0000)
 		pintsPoured = litersPoured * 2.11338
 	if (pouring == True and pinState == lastPinState and (currentTime - lastPinChange) > 3000):
-		pouring = False	
-    			
+		pouring = False
+	if (pintsPoured > 0.1):
+		pourTime = int((currentTime - pourStart)/1000) - 3
+		tweet = 'Someone just poured ' + str(round(pintsPoured,2)) + ' pints of root beer in ' + str(pourTime) + ' seconds'
+		t.statuses.update(status=tweet)
+		litersPoured = 0
+		pintsPoured = 0		
+	lastPinChange = pinChange
+	lastPinState = pinState			
 	
 if __name__ == '__main__':     # Program start from here
   setGlobals()
