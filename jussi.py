@@ -1,4 +1,4 @@
-import subprocess
+uimport subprocess
 import sys
 import RPi.GPIO as GPIO
 import time
@@ -31,18 +31,21 @@ def setGlobals():
 	tube = 21
 
 def openPin(pin):
+    now = datetime.datetime.now()
 	GPIO.output(pin,GPIO.LOW)
-	logging.info(str(datetime.datetime.now()) + " Water starts")
+	logging.info(str(now))
+	logging.debug("Open")
 	print "openPin()"
 
 def closePin(pin):
+    now = datetime.datetime.now()
 	GPIO.output(pin,GPIO.HIGH) 
-	logging.info(str(datetime.datetime.now()) + " Water stops")
+	logging.info(str(now))
+	logging.debug("Close")
 	print "closePin()"
 
 def setup():
 	print "Start setup()"
-	#GPIO.setmode(GPIO.BOARD) #Numbers GPIOs by physical location
 	GPIO.setup(water, GPIO.OUT) 
 	GPIO.setup(tube, GPIO.OUT) 
 	GPIO.setup(22,GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -169,13 +172,7 @@ if __name__ == '__main__':     # Program start from here
   try:
     while True:
         now = datetime.datetime.now()
-<<<<<<< HEAD
-        getStatus()          
-=======
-        getStatus() 
-        logging.debug(str(now))
-        logging.debug("Status" + str(status))             
->>>>>>> 8683a49cf4506e474340635175bf1a264c21b504
+        getStatus()
         if sendDataMorningTime < now < sendDataNightTime and sendDataMorningBit == False:
             sendDataMorningBit = True
             getAndWrite()
