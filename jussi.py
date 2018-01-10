@@ -51,8 +51,8 @@ def setup():
 	GPIO.setup(22,GPIO.IN, pull_up_down=GPIO.PUD_UP)
 	closePin(water)
 	closePin(tube)
-	logging.basicConfig(filename='log.txt',level=logging.DEBUG)			             
-		
+	logging.basicConfig(filename='log.txt',level=logging.DEBUG)
+
 def getValues(sp):
 	print "Start getValues()"
 	global Liters,temp,hum
@@ -143,24 +143,24 @@ def changeStatusTrue():
 	if status == False:
 		status = True
 		openPin(water)
-		print "Watering... Status: " + str(status)	
+		print "Watering... Status: " + str(status)
 
 def changeStatusFalse():
 	global status, water
 	if status == True:
 		status = False
 		closePin(water)
-		print "Watering... Status: " + str(status)	
-	
+		print "Watering... Status: " + str(status)
+
 if __name__ == '__main__':     # Program start from here
   setGlobals()
- 
+
   CLK = 11
   CS = 8
   MISO = 9
   MOSI = 10
   mcp = Adafruit_MCP3008.MCP3008(clk=CLK, cs=CS, miso=MISO, mosi=MOSI)
-  
+
   setup()
   now = datetime.datetime.now()
   sendDataMorningTime = now.replace(hour=8, minute=0, second=0, microsecond=0)
@@ -181,10 +181,10 @@ if __name__ == '__main__':     # Program start from here
             getAndWrite()
         elif now < restartTime and sendDataMorningBit == True:
             sendDataNightBit = False
-            sendDataMorningBit = False		
-        time.sleep(2) 	
+            sendDataMorningBit = False
+        time.sleep(2)
   except KeyboardInterrupt:
     print "Exiting Safely"
     closePin(water)
-    time.sleep(2) 
-    GPIO.cleanup() 
+    time.sleep(2)
+    GPIO.cleanup()
