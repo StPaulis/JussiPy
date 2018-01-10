@@ -59,7 +59,7 @@ def getValues(sp):
 		print "Humidity:" + str(hum)
 	elif sp == 2:
 		t = mcp.read_adc(7)
-		if t < 60 and t > 40
+		if t < 60 and t > 40:
 			temp = float(t) - 40
 		print "Temperature:" + str(temp)
 	elif sp == 3:
@@ -169,7 +169,13 @@ if __name__ == '__main__':     # Program start from here
   try:
     while True:
         now = datetime.datetime.now()
+<<<<<<< HEAD
         getStatus()          
+=======
+        getStatus() 
+        logging.debug(str(now))
+        logging.debug("Status" + str(status))             
+>>>>>>> 8683a49cf4506e474340635175bf1a264c21b504
         if sendDataMorningTime < now < sendDataNightTime and sendDataMorningBit == False:
             sendDataMorningBit = True
             getAndWrite()
