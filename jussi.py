@@ -32,10 +32,12 @@ def setGlobals():
 
 def openPin(pin):
 	GPIO.output(pin,GPIO.LOW)
+	logging.info(str(datetime.datetime.now()) + " Water starts")
 	print "openPin()"
 
 def closePin(pin):
 	GPIO.output(pin,GPIO.HIGH) 
+	logging.info(str(datetime.datetime.now()) + " Water stops")
 	print "closePin()"
 
 def setup():
@@ -114,6 +116,7 @@ def getAndWrite():
 			try:
 				response = urllib2.urlopen(req, json.dumps(data))									
 			except:
+				logging.error(str(datetime.datetime.now()) + " request error getvalues")
 				print "Error getvalues"
 
 def getStatus():
@@ -166,9 +169,7 @@ if __name__ == '__main__':     # Program start from here
   try:
     while True:
         now = datetime.datetime.now()
-        getStatus() 
-		logging.debug(str(now)
-		logging.debug("Status" + str(status))             
+        getStatus()          
         if sendDataMorningTime < now < sendDataNightTime and sendDataMorningBit == False:
             sendDataMorningBit = True
             getAndWrite()
